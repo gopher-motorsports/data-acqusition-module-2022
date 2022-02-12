@@ -33,7 +33,7 @@
 		<link>
 			<name>Core/Gopher_Sense</name>
 			<type>2</type>
-			<location>C:/Users/admin/STM32CubeIDE/workspace_1.8.0/Gopher_Sense</location>
+			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/Gopher_Sense</locationURI>
 		</link>
 		<link>
 			<name>Core/gophercan-lib</name>
