@@ -6,51 +6,43 @@ data_input_methods:
         ADC1_IN5:
             sensor: "32313757"
             min_frequency: 10
-                    
+
         ADC1_IN14:
             sensor: "32313757"
             min_frequency: 20
-            
+
         ADC1_IN2:
             sensor: "185624"
             min_frequency: 30
-            
+
         ADC3_IN14:
             sensor: "NTC M12-H"
-            min_frequency: 1        
-    
+            min_frequency: 1
+
     can_sensors:
-        can_sensor_1: 
+        can_sensor_1:
             sensor: "MM5.10-R"
         can_sensor_2:
             sensor: "IRTS-V2"
-            
+
 parameters_produced:
     oil_cooler_pressure_in:
         gophercan_id: 1
         produced_by: ADC1_IN5
         depends_on: pressure
         filter_subparams:
-            oil_cooler_pressure_in_lowpass_1000:
-                gophercan_id: 11
-                filter_type: low_pass
-                filter_value: 1000
         buffering:
             num_samples_buffered: 100
 
-            
+
     oil_cooler_pressure_out:
         gophercan_id: 2
         produced_by: ADC1_IN14
         depends_on: pressure
         filter_subparams:
-            oil_cooler_pressure_out_lowpass_1000:
-                filter_type: low_pass
-                filter_value: 1000
-                gophercan_id: 12
         buffering:
             num_samples_buffered: 100
-            
+
     lateral_acceleration:
         gophercan_id: 3
         produced_by: can_sensor_1
@@ -58,7 +50,7 @@ parameters_produced:
         filter_subparams:
         buffering:
             num_samples_buffered: 100
-            
+
     longitudinal_acceleration:
         gophercan_id: 4
         produced_by: can_sensor_1
@@ -66,7 +58,7 @@ parameters_produced:
         filter_subparams:
         buffering:
             num_samples_buffered: 100
-    
+
     rad_water_temp_in:
         gophercan_id: 5
         produced_by: ADC3_IN14
@@ -75,7 +67,7 @@ parameters_produced:
         buffering:
             num_samples_buffered: 100
 
-        
+
     yaw_rate:
         gophercan_id: 6
         produced_by: can_sensor_1
@@ -83,8 +75,8 @@ parameters_produced:
         filter_subparams:
         buffering:
             num_samples_buffered: 100
-            
-        
+
+
     back_left_tire_temp_channel_1:
         gophercan_id: 7
         produced_by: can_sensor_2
@@ -94,7 +86,7 @@ parameters_produced:
             num_samples_buffered: 100
 
 
-non_gophercan_data_produced:
+non_gophercan_data_produced: #implement
     sensor_data_1:
         type: U16
         produced_by: ADC3_IN14
@@ -124,17 +116,9 @@ buckets:
         parameters:
             - lateral_acceleration
             - longitudinal_acceleration
-    
+
     bucket_3:
         id: 3
         frequency: 1
         parameters:
             - back_left_tire_temp_channel_1
-            
-            
-            
-            
-            
-            
-            
-           

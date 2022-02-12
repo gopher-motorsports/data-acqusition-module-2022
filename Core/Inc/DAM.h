@@ -20,7 +20,9 @@ typedef enum {
     CAN_ERROR = 2,
     RUNTIME_ERROR = 3,
     CRITICAL_ERROR = 4,
-    TBD_ERROR = 5
+	CONVERSION_ERROR = 5,
+    TBD_ERROR = 6,
+
 } DAM_ERROR_STATE;
 
 

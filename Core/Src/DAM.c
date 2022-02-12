@@ -83,7 +83,11 @@ void handle_DAM_error (DAM_ERROR_STATE error_state) {
             NVIC_SystemReset();
             break;
         }
-
+        case CONVERSION_ERROR:
+        {
+        	//send can error???
+        	break;
+        }
         default:
         {
             error_count++;
@@ -100,12 +104,6 @@ void DAM_init(void) {
             handle_DAM_error(INITIALIZATION_ERROR);
         }
         set_all_params_state(TRUE);
-
-        send_can_command(PRIO_HIGH, DLM_ID, SET_LED_STATE, 0, 0xAA,0x55,0xAA);
-        send_can_command(PRIO_HIGH, DLM_ID, SET_LED_STATE, 0, 0xAA,0x55,0xAA);
-        send_can_command(PRIO_HIGH, DLM_ID, SET_LED_STATE, 0, 0xAA,0x55,0xAA);
-
-
         init_sensor_hal();
 
         add_custom_can_func(SEND_BUCKET_PARAMS, &send_bucket_params, TRUE, NULL);
@@ -227,7 +225,7 @@ void ADC_sensor_service (void) {
             float converted;
             if (apply_analog_sensor_conversion(&param->analog_sensor, data_in, &converted)
                  != BUFFER_SUCCESS) {
-                converted = DATA_CONV_FAILURE_REPLACEMENT;
+                handle_DAM_error(CONVERSION_ERROR);
             }
             // No data cast as we assume params are set up correctly
             param->analog_param.param.float_struct.data = converted;
@@ -247,7 +245,7 @@ void ADC_sensor_service (void) {
             float converted;
             if (apply_analog_sensor_conversion(&param->analog_sensor, data_in, &converted)
                  != BUFFER_SUCCESS) {
-                converted = DATA_CONV_FAILURE_REPLACEMENT;
+            	 handle_DAM_error(CONVERSION_ERROR);
             }
             // No data cast as we assume params are set up correctly
             param->analog_param.param.float_struct.data = converted;
@@ -267,7 +265,7 @@ void ADC_sensor_service (void) {
             float converted;
             if (apply_analog_sensor_conversion(&param->analog_sensor, data_in, &converted)
                  != BUFFER_SUCCESS) {
-                converted = DATA_CONV_FAILURE_REPLACEMENT;
+            	handle_DAM_error(CONVERSION_ERROR);
             }
             // No data cast as we assume params are set up correctly
             param->analog_param.param.float_struct.data = converted;
@@ -290,7 +288,7 @@ void sensorCAN_service (void) {
             float converted;
             if (apply_can_sensor_conversion(&param->can_sensor, param->message_idx, data_in, &converted)
                  != BUFFER_SUCCESS) {
-                converted = DATA_CONV_FAILURE_REPLACEMENT;
+            	handle_DAM_error(CONVERSION_ERROR);
             }
             // No data cast as we assume params are set up correctly
             param->can_param.param.float_struct.data = converted; // fill the data
@@ -300,6 +298,7 @@ void sensorCAN_service (void) {
     }
 }
 
+// THis has to do with filtering, so do this whomever implements that
 void fill_can_subparams (CAN_SENSOR_PARAM* param, float newdata) {
     for (U8 i = 0; i < param->num_filtered_params; i++) {
 //        U16_BUFFER temp = param->buffer;
@@ -320,6 +319,8 @@ void fill_can_subparams (CAN_SENSOR_PARAM* param, float newdata) {
     }
 }
 
+
+// THis has to do with filtering, so do this whomever implements that
 void fill_analog_subparams (ANALOG_SENSOR_PARAM* param, float newdata) {
     for (U8 i = 0; i < param->num_filtered_subparams; i++) {
 //            U16_BUFFER temp = param->buffer;
