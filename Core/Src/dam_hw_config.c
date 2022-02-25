@@ -5,31 +5,43 @@
 
 
 
-
+	
 // adc1_param1
-ANALOG_SENSOR_PARAM adc1_param1;
-GENERAL_PARAMETER adc1_param1_genparam;
+#define ADC1_PARAM1_BUF_SIZE 100
+U32 adc1_param1_buffer_mem[ADC1_PARAM1_BUF_SIZE];
+ANALOG_SENSOR_PARAM adc1_param1 =
+{
+  .analog_param =
+  {
+    .param = &float_tester_2,
+    .status = CLEAN,
+  },
+  .analog_sensor = &basic_resistive_sensor_for_testing,
+  .num_filtered_subparams = 0, // not yet implemented
+  .filtered_subparams = NULL, // not yet implemented
+  .buffer =
+  {
+    .buffer = adc1_param1_buffer_mem,
+    .buffer_size = ADC1_PARAM1_BUF_SIZE,
+    .fill_level = 0
+  },
+};
+#undef ADC1_PARAM1_BUF_SIZE
+
+	
+	// adc1_param2
+	ANALOG_SENSOR_PARAM adc1_param2;
+	GENERAL_PARAMETER adc1_param2_genparam;
+	
+	
+	
+	U32_BUFFER adc1_param2_u32buffer;
+	U32 adc1_param2_buffer[100];
 
 
 
 
-U16_BUFFER adc1_param1_u16buffer;
-U16 adc1_param1_buffer[100];
-
-
-// adc1_param2
-ANALOG_SENSOR_PARAM adc1_param2;
-GENERAL_PARAMETER adc1_param2_genparam;
-
-
-
-
-U16_BUFFER adc1_param2_u16buffer;
-U16 adc1_param2_buffer[100];
-
-
-
-ANALOG_SENSOR_PARAM adc1_sensor_params[NUM_ADC1_PARAMS];
+	ANALOG_SENSOR_PARAM adc1_sensor_params[NUM_ADC1_PARAMS];
 
 
 
@@ -38,43 +50,43 @@ ANALOG_SENSOR_PARAM adc1_sensor_params[NUM_ADC1_PARAMS];
 //ADC1
 void init_adc1_params (void) {
     
-    
-    // adc1_param1
-    adc1_param1_genparam.param.float_struct = float_tester_2;
-    adc1_param1.analog_sensor = basic_resistive_sensor_for_testing;
-    
-    adc1_param1.num_filtered_subparams = 0;
+		
+		// adc1_param1
+		adc1_param1_genparam.param.float_struct = float_tester_2;
+		adc1_param1.analog_sensor = basic_resistive_sensor_for_testing;
+		
+		adc1_param1.num_filtered_subparams = 0;
 
-    
-    adc1_param1.filtered_subparams = NULL;
-    
+		
+			adc1_param1.filtered_subparams = NULL;
+		
 
-    adc1_param1_u16buffer.buffer = adc1_param1_buffer;
-    adc1_param1_u16buffer.buffer_size = 100;
-    adc1_param1_u16buffer.fill_level = 0;
-    adc1_param1.buffer = adc1_param1_u16buffer;
+		adc1_param1_u32buffer.buffer = adc1_param1_buffer;
+		adc1_param1_u32buffer.buffer_size = 100;
+		adc1_param1_u32buffer.fill_level = 0;
+		adc1_param1.buffer = adc1_param1_u32buffer;
     
-    
-    // adc1_param2
-    adc1_param2_genparam.param.float_struct = float_tester;
-    adc1_param2.analog_sensor = basic_voltage_sensor_for_testing;
-    
-    adc1_param2.num_filtered_subparams = 0;
+		
+		// adc1_param2
+		adc1_param2_genparam.param.float_struct = float_tester;
+		adc1_param2.analog_sensor = basic_voltage_sensor_for_testing;
+		
+		adc1_param2.num_filtered_subparams = 0;
 
-    
-    adc1_param2.filtered_subparams = NULL;
-    
+		
+			adc1_param2.filtered_subparams = NULL;
+		
 
-    adc1_param2_u16buffer.buffer = adc1_param2_buffer;
-    adc1_param2_u16buffer.buffer_size = 100;
-    adc1_param2_u16buffer.fill_level = 0;
-    adc1_param2.buffer = adc1_param2_u16buffer;
+		adc1_param2_u32buffer.buffer = adc1_param2_buffer;
+		adc1_param2_u32buffer.buffer_size = 100;
+		adc1_param2_u32buffer.fill_level = 0;
+		adc1_param2.buffer = adc1_param2_u32buffer;
     
     
     
-    adc1_sensor_params[0] = adc1_param1;
+		adc1_sensor_params[0] = adc1_param1;
     
-    adc1_sensor_params[1] = adc1_param2;
+		adc1_sensor_params[1] = adc1_param2;
     
 
 }
@@ -125,8 +137,8 @@ CAN_SENSOR_PARAM can_param1;
 
 
 
-U16_BUFFER can_param1_u16buffer;
-U16 can_param1_buffer[1];
+U32_BUFFER can_param1_u32buffer;
+U32 can_param1_buffer[1];
 
 
 // can_param2
@@ -136,8 +148,8 @@ CAN_SENSOR_PARAM can_param2;
 
 
 
-U16_BUFFER can_param2_u16buffer;
-U16 can_param2_buffer[1];
+U32_BUFFER can_param2_u32buffer;
+U32 can_param2_buffer[1];
 
 
 // can_param3
@@ -147,8 +159,8 @@ CAN_SENSOR_PARAM can_param3;
 
 
 
-U16_BUFFER can_param3_u16buffer;
-U16 can_param3_buffer[1];
+U32_BUFFER can_param3_u32buffer;
+U32 can_param3_buffer[1];
 
 
 // can_param4
@@ -158,8 +170,8 @@ CAN_SENSOR_PARAM can_param4;
 
 
 
-U16_BUFFER can_param4_u16buffer;
-U16 can_param4_buffer[1];
+U32_BUFFER can_param4_u32buffer;
+U32 can_param4_buffer[1];
 
 
 
@@ -182,11 +194,11 @@ can_param1.num_filtered_params = 0;
 can_param1.filtered_subparams = NULL;
 
 
-can_param1_u16buffer.buffer = can_param1_buffer;
-can_param1_u16buffer.buffer_size = 1;
-can_param1_u16buffer.fill_level = 0;
+can_param1_u32buffer.buffer = can_param1_buffer;
+can_param1_u32buffer.buffer_size = 1;
+can_param1_u32buffer.fill_level = 0;
 
-can_param1.buffer = can_param1_u16buffer;
+can_param1.buffer = can_param1_u32buffer;
 
 
 
@@ -202,11 +214,11 @@ can_param2.num_filtered_params = 0;
 can_param2.filtered_subparams = NULL;
 
 
-can_param2_u16buffer.buffer = can_param2_buffer;
-can_param2_u16buffer.buffer_size = 1;
-can_param2_u16buffer.fill_level = 0;
+can_param2_u32buffer.buffer = can_param2_buffer;
+can_param2_u32buffer.buffer_size = 1;
+can_param2_u32buffer.fill_level = 0;
 
-can_param2.buffer = can_param2_u16buffer;
+can_param2.buffer = can_param2_u32buffer;
 
 
 
@@ -222,11 +234,11 @@ can_param3.num_filtered_params = 0;
 can_param3.filtered_subparams = NULL;
 
 
-can_param3_u16buffer.buffer = can_param3_buffer;
-can_param3_u16buffer.buffer_size = 1;
-can_param3_u16buffer.fill_level = 0;
+can_param3_u32buffer.buffer = can_param3_buffer;
+can_param3_u32buffer.buffer_size = 1;
+can_param3_u32buffer.fill_level = 0;
 
-can_param3.buffer = can_param3_u16buffer;
+can_param3.buffer = can_param3_u32buffer;
 
 
 
@@ -242,11 +254,11 @@ can_param4.num_filtered_params = 0;
 can_param4.filtered_subparams = NULL;
 
 
-can_param4_u16buffer.buffer = can_param4_buffer;
-can_param4_u16buffer.buffer_size = 1;
-can_param4_u16buffer.fill_level = 0;
+can_param4_u32buffer.buffer = can_param4_buffer;
+can_param4_u32buffer.buffer_size = 1;
+can_param4_u32buffer.fill_level = 0;
 
-can_param4.buffer = can_param4_u16buffer;
+can_param4.buffer = can_param4_u32buffer;
 
 
 

@@ -9,7 +9,7 @@ data_input_methods:
             sensor: "test_analog_sensor"
             min_frequency: 100
 
-        ADC1_IN6:
+        ADC2_IN6:
             sensor: "test_resistive_sensor"
             min_frequency: 100
             
@@ -26,7 +26,7 @@ parameters_produced:
             num_samples_buffered: 100
 
     float_tester_2:
-        produced_by: ADC1_IN6
+        produced_by: ADC2_IN6
         sensor_output: current
         filter_subparams:
         buffering:
