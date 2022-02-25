@@ -28,7 +28,7 @@ extern TIM_HandleTypeDef htim10;
 extern TIM_HandleTypeDef htim11;
 extern TIM_HandleTypeDef htim14;
 
-#define THIS_DAM_ID DAM_ID
+#define THIS_DAM_ID DAM_FR_ID
 
 #define GOPHERCAN_HANDLE hcan1
 #define SENSORCAN_HANDLE hcan2
