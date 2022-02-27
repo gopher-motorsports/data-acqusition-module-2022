@@ -5,354 +5,296 @@
 
 
 
-	
-// adc1_param1
+
+// BEGIN ADC1 PARAMS
+
+// give memory to the buffers
+
+
 #define ADC1_PARAM1_BUF_SIZE 100
 U32 adc1_param1_buffer_mem[ADC1_PARAM1_BUF_SIZE];
-ANALOG_SENSOR_PARAM adc1_param1 =
+
+// Fill out the array with all of the sensor params
+ANALOG_SENSOR_PARAM adc1_sensor_params[NUM_ADC1_PARAMS] = 
 {
-  .analog_param =
+  
+  
+  // adc1_param1
   {
-    .param = &float_tester_2,
-    .status = CLEAN,
+    .analog_param =
+    {
+      .can_param = &float_tester,
+      .status = CLEAN,
+    },
+    .analog_sensor = &basic_voltage_sensor_for_testing,
+    .num_filtered_subparams = 0, // not yet implemented
+    .filtered_subparams = NULL, // not yet implemented
+    .buffer =
+    {
+      .buffer = adc1_param1_buffer_mem,
+      .buffer_size = ADC1_PARAM1_BUF_SIZE,
+      .fill_level = 0
+    }
   },
-  .analog_sensor = &basic_resistive_sensor_for_testing,
-  .num_filtered_subparams = 0, // not yet implemented
-  .filtered_subparams = NULL, // not yet implemented
-  .buffer =
-  {
-    .buffer = adc1_param1_buffer_mem,
-    .buffer_size = ADC1_PARAM1_BUF_SIZE,
-    .fill_level = 0
-  },
+  #undef ADC1_PARAM1_BUF_SIZE
+  
 };
-#undef ADC1_PARAM1_BUF_SIZE
 
-	
-	// adc1_param2
-	ANALOG_SENSOR_PARAM adc1_param2;
-	GENERAL_PARAMETER adc1_param2_genparam;
-	
-	
-	
-	U32_BUFFER adc1_param2_u32buffer;
-	U32 adc1_param2_buffer[100];
-
-
-
-
-	ANALOG_SENSOR_PARAM adc1_sensor_params[NUM_ADC1_PARAMS];
-
-
-
-
-
-//ADC1
-void init_adc1_params (void) {
-    
-		
-		// adc1_param1
-		adc1_param1_genparam.param.float_struct = float_tester_2;
-		adc1_param1.analog_sensor = basic_resistive_sensor_for_testing;
-		
-		adc1_param1.num_filtered_subparams = 0;
-
-		
-			adc1_param1.filtered_subparams = NULL;
-		
-
-		adc1_param1_u32buffer.buffer = adc1_param1_buffer;
-		adc1_param1_u32buffer.buffer_size = 100;
-		adc1_param1_u32buffer.fill_level = 0;
-		adc1_param1.buffer = adc1_param1_u32buffer;
-    
-		
-		// adc1_param2
-		adc1_param2_genparam.param.float_struct = float_tester;
-		adc1_param2.analog_sensor = basic_voltage_sensor_for_testing;
-		
-		adc1_param2.num_filtered_subparams = 0;
-
-		
-			adc1_param2.filtered_subparams = NULL;
-		
-
-		adc1_param2_u32buffer.buffer = adc1_param2_buffer;
-		adc1_param2_u32buffer.buffer_size = 100;
-		adc1_param2_u32buffer.fill_level = 0;
-		adc1_param2.buffer = adc1_param2_u32buffer;
-    
-    
-    
-		adc1_sensor_params[0] = adc1_param1;
-    
-		adc1_sensor_params[1] = adc1_param2;
-    
-
-}
 // ***************************************************************************
 
 
 
-ANALOG_SENSOR_PARAM adc2_sensor_params[NUM_ADC2_PARAMS];
-
-
-
-
-
-//ADC2
-void init_adc2_params (void) {
-    
-    
-    
-
-}
-// ******************************************************************
-
-
-
-ANALOG_SENSOR_PARAM adc3_sensor_params[NUM_ADC3_PARAMS];
-
-
-
-
-
-//ADC3
-void init_adc3_params (void) {
-    
-    
-    
-
-}
-
-
-
-//CAN_SENSOR_PARAMS
-
-
-// can_param1
-CAN_SENSOR_PARAM can_param1;
-
-
-
-
-
-U32_BUFFER can_param1_u32buffer;
-U32 can_param1_buffer[1];
-
-
-// can_param2
-CAN_SENSOR_PARAM can_param2;
-
-
-
-
-
-U32_BUFFER can_param2_u32buffer;
-U32 can_param2_buffer[1];
-
-
-// can_param3
-CAN_SENSOR_PARAM can_param3;
-
-
-
-
-
-U32_BUFFER can_param3_u32buffer;
-U32 can_param3_buffer[1];
-
-
-// can_param4
-CAN_SENSOR_PARAM can_param4;
-
-
-
-
-
-U32_BUFFER can_param4_u32buffer;
-U32 can_param4_buffer[1];
-
-
-
-
-CAN_SENSOR_PARAM can_sensor_params[NUM_CAN_SENSOR_PARAMS];
-
-
-void init_can_params (void) {
-
-
-// can_param1
-can_param1.can_param.param.float_struct = float_tester_3;
-
-can_param1.can_sensor = can_sensor_for_testing;
-can_param1.message_idx = 0;
-
-can_param1.num_filtered_params = 0;
-
-
-can_param1.filtered_subparams = NULL;
-
-
-can_param1_u32buffer.buffer = can_param1_buffer;
-can_param1_u32buffer.buffer_size = 1;
-can_param1_u32buffer.fill_level = 0;
-
-can_param1.buffer = can_param1_u32buffer;
-
-
-
-// can_param2
-can_param2.can_param.param.float_struct = float_tester_4;
-
-can_param2.can_sensor = can_sensor_for_testing;
-can_param2.message_idx = 1;
-
-can_param2.num_filtered_params = 0;
-
-
-can_param2.filtered_subparams = NULL;
-
-
-can_param2_u32buffer.buffer = can_param2_buffer;
-can_param2_u32buffer.buffer_size = 1;
-can_param2_u32buffer.fill_level = 0;
-
-can_param2.buffer = can_param2_u32buffer;
-
-
-
-// can_param3
-can_param3.can_param.param.float_struct = float_tester_5;
-
-can_param3.can_sensor = can_sensor_for_testing;
-can_param3.message_idx = 2;
-
-can_param3.num_filtered_params = 0;
-
-
-can_param3.filtered_subparams = NULL;
-
-
-can_param3_u32buffer.buffer = can_param3_buffer;
-can_param3_u32buffer.buffer_size = 1;
-can_param3_u32buffer.fill_level = 0;
-
-can_param3.buffer = can_param3_u32buffer;
-
-
-
-// can_param4
-can_param4.can_param.param.float_struct = float_tester_6;
-
-can_param4.can_sensor = can_sensor_for_testing;
-can_param4.message_idx = 3;
-
-can_param4.num_filtered_params = 0;
-
-
-can_param4.filtered_subparams = NULL;
-
-
-can_param4_u32buffer.buffer = can_param4_buffer;
-can_param4_u32buffer.buffer_size = 1;
-can_param4_u32buffer.fill_level = 0;
-
-can_param4.buffer = can_param4_u32buffer;
-
-
-
-
-
-
-can_sensor_params[0] = can_param1;
-
-can_sensor_params[1] = can_param2;
-
-can_sensor_params[2] = can_param3;
-
-can_sensor_params[3] = can_param4;
-
-
-
-}
-
-
-// Buckets if any
-
-// Define bucket bucket_1
-BUCKET bucket_1;
-
-PARAM_LIST bucket_1_bucket_param_list;
-
-GENERAL_PARAMETER bucket_1_bucket_general_param_list[2];
-
-// Define bucket bucket_2
-BUCKET bucket_2;
-
-PARAM_LIST bucket_2_bucket_param_list;
-
-GENERAL_PARAMETER bucket_2_bucket_general_param_list[2];
-
-// Define bucket bucket_3
-BUCKET bucket_3;
-
-PARAM_LIST bucket_3_bucket_param_list;
-
-GENERAL_PARAMETER bucket_3_bucket_general_param_list[2];
-
-BUCKET buckets[NUM_BUCKETS];
-
-
-// ************************************************
-void init_buckets (void) {
-
-// Define bucket bucket_1
-bucket_1.bucket_id = 1;
-bucket_1.frequency = 10;
-bucket_1_bucket_param_list.len = 2;
-
-
-bucket_1_bucket_general_param_list[0].param.float_struct = float_tester;
-bucket_1_bucket_general_param_list[1].param.float_struct = float_tester_2;
-
-
-bucket_1_bucket_param_list.list = bucket_1_bucket_general_param_list;
-bucket_1.bucket = bucket_1_bucket_param_list;
-
-// Define bucket bucket_2
-bucket_2.bucket_id = 2;
-bucket_2.frequency = 50;
-bucket_2_bucket_param_list.len = 2;
-
-
-bucket_2_bucket_general_param_list[0].param.float_struct = float_tester_3;
-bucket_2_bucket_general_param_list[1].param.float_struct = float_tester_4;
-
-
-bucket_2_bucket_param_list.list = bucket_2_bucket_general_param_list;
-bucket_2.bucket = bucket_2_bucket_param_list;
-
-// Define bucket bucket_3
-bucket_3.bucket_id = 3;
-bucket_3.frequency = 1;
-bucket_3_bucket_param_list.len = 2;
-
-
-bucket_3_bucket_general_param_list[0].param.float_struct = float_tester_5;
-bucket_3_bucket_general_param_list[1].param.float_struct = float_tester_6;
-
-
-bucket_3_bucket_param_list.list = bucket_3_bucket_general_param_list;
-bucket_3.bucket = bucket_3_bucket_param_list;
-
-
-buckets[0] = bucket_1;
-buckets[1] = bucket_2;
-buckets[2] = bucket_3;
-
-
-}
+// BEGIN ADC2 PARAMS
+
+// give memory to the buffers
+
+
+#define ADC2_PARAM1_BUF_SIZE 100
+U32 adc2_param1_buffer_mem[ADC2_PARAM1_BUF_SIZE];
+
+// Fill out the array with all of the sensor params
+ANALOG_SENSOR_PARAM adc2_sensor_params[NUM_ADC2_PARAMS] = 
+{
+  
+  
+  // adc2_param1
+  {
+    .analog_param =
+    {
+      .can_param = &float_tester_2,
+      .status = CLEAN,
+    },
+    .analog_sensor = &basic_resistive_sensor_for_testing,
+    .num_filtered_subparams = 0, // not yet implemented
+    .filtered_subparams = NULL, // not yet implemented
+    .buffer =
+    {
+      .buffer = adc2_param1_buffer_mem,
+      .buffer_size = ADC2_PARAM1_BUF_SIZE,
+      .fill_level = 0
+    }
+  },
+  #undef ADC2_PARAM1_BUF_SIZE
+  
+};
+
+// ***************************************************************************
+
+
+
+// No parameters on ADC3
+
+// ***************************************************************************
+
+
+
+// BEGIN CAN PARAMS
+// give memory to the buffers
+
+
+#define CAN_PARAM1_BUF_SIZE 1
+U32 can_param1_buffer_mem[CAN_PARAM1_BUF_SIZE];
+
+
+#define CAN_PARAM2_BUF_SIZE 1
+U32 can_param2_buffer_mem[CAN_PARAM2_BUF_SIZE];
+
+
+#define CAN_PARAM3_BUF_SIZE 1
+U32 can_param3_buffer_mem[CAN_PARAM3_BUF_SIZE];
+
+
+#define CAN_PARAM4_BUF_SIZE 1
+U32 can_param4_buffer_mem[CAN_PARAM4_BUF_SIZE];
+
+// Fill out the array with all of the sensor params
+CAN_SENSOR_PARAM can_sensor_params[NUM_CAN_SENSOR_PARAMS] =
+{
+  
+  
+  
+  // can_param1
+  {
+
+    .can_param =
+    {
+      .can_param = &float_tester_3,
+      .status = CLEAN,
+    },
+    .can_sensor = &can_sensor_for_testing,
+    .message_idx = 0,
+    .num_filtered_subparams = 0, // not yet implemented
+    .filtered_subparams = NULL, // not yet implemented
+    .buffer =
+    {
+      .buffer = can_param1_buffer_mem,
+      .buffer_size = CAN_PARAM1_BUF_SIZE,
+      .fill_level = 0
+    }
+
+  },
+  #undef CAN_PARAM1_BUF_SIZE
+  
+  
+  
+  // can_param2
+  {
+
+    .can_param =
+    {
+      .can_param = &float_tester_4,
+      .status = CLEAN,
+    },
+    .can_sensor = &can_sensor_for_testing,
+    .message_idx = 1,
+    .num_filtered_subparams = 0, // not yet implemented
+    .filtered_subparams = NULL, // not yet implemented
+    .buffer =
+    {
+      .buffer = can_param2_buffer_mem,
+      .buffer_size = CAN_PARAM2_BUF_SIZE,
+      .fill_level = 0
+    }
+
+  },
+  #undef CAN_PARAM2_BUF_SIZE
+  
+  
+  
+  // can_param3
+  {
+
+    .can_param =
+    {
+      .can_param = &float_tester_5,
+      .status = CLEAN,
+    },
+    .can_sensor = &can_sensor_for_testing,
+    .message_idx = 2,
+    .num_filtered_subparams = 0, // not yet implemented
+    .filtered_subparams = NULL, // not yet implemented
+    .buffer =
+    {
+      .buffer = can_param3_buffer_mem,
+      .buffer_size = CAN_PARAM3_BUF_SIZE,
+      .fill_level = 0
+    }
+
+  },
+  #undef CAN_PARAM3_BUF_SIZE
+  
+  
+  
+  // can_param4
+  {
+
+    .can_param =
+    {
+      .can_param = &float_tester_6,
+      .status = CLEAN,
+    },
+    .can_sensor = &can_sensor_for_testing,
+    .message_idx = 3,
+    .num_filtered_subparams = 0, // not yet implemented
+    .filtered_subparams = NULL, // not yet implemented
+    .buffer =
+    {
+      .buffer = can_param4_buffer_mem,
+      .buffer_size = CAN_PARAM4_BUF_SIZE,
+      .fill_level = 0
+    }
+
+  },
+  #undef CAN_PARAM4_BUF_SIZE
+  
+};
+
+// ***************************************************************************
+
+// BUCKETS
+// setup the param lists for each bucket
+
+GENERAL_PARAMETER bucket_1_bucket_general_param_list[2] =
+{
+  {
+    .can_param = &float_tester,
+    .status = CLEAN
+  },
+  {
+    .can_param = &float_tester_2,
+    .status = CLEAN
+  },
+  
+};
+
+GENERAL_PARAMETER bucket_2_bucket_general_param_list[2] =
+{
+  {
+    .can_param = &float_tester_3,
+    .status = CLEAN
+  },
+  {
+    .can_param = &float_tester_4,
+    .status = CLEAN
+  },
+  
+};
+
+GENERAL_PARAMETER bucket_3_bucket_general_param_list[2] =
+{
+  {
+    .can_param = &float_tester_5,
+    .status = CLEAN
+  },
+  {
+    .can_param = &float_tester_6,
+    .status = CLEAN
+  },
+  
+};
+
+
+// initalize the bucket structs
+BUCKET bucket_list[NUM_BUCKETS] =
+{
+  
+  // Define bucket bucket_1
+  {
+    .bucket_id = 1,
+    .frequency = 10,
+    .state = BUCKET_INIT,
+    .param_list = 
+    {
+      .len = 2,
+      .list = bucket_1_bucket_general_param_list
+    }
+  },
+  
+  // Define bucket bucket_2
+  {
+    .bucket_id = 2,
+    .frequency = 50,
+    .state = BUCKET_INIT,
+    .param_list = 
+    {
+      .len = 2,
+      .list = bucket_2_bucket_general_param_list
+    }
+  },
+  
+  // Define bucket bucket_3
+  {
+    .bucket_id = 3,
+    .frequency = 1,
+    .state = BUCKET_INIT,
+    .param_list = 
+    {
+      .len = 2,
+      .list = bucket_3_bucket_general_param_list
+    }
+  },
+  
+};
 
 
 //END autogenerted file

@@ -13,7 +13,9 @@
 #include "stm32f7xx_hal_can.h"
 #include "DAM.h"
 #include "sensor_hal.h"
+#include "dam_hw_config.h"
 
+// TODO send these in instead of externing
 extern ADC_HandleTypeDef hadc1;
 extern ADC_HandleTypeDef hadc2;
 extern ADC_HandleTypeDef hadc3;
@@ -46,7 +48,8 @@ extern TIM_HandleTypeDef htim14;
 #define DATA_CONV_FAILURE_REPLACEMENT -1
 
 
-typedef enum {
+typedef enum
+{
     WAITING = 0,
     CONFIG = 1,
     NORMAL = 2
@@ -60,18 +63,20 @@ static DAM_ERROR_STATE latched_error_state = NO_ERRORS;
 static boolean hasInitialized = FALSE;
 
 
-//void change_led_state(U8 sender, void* parameter, U8 remote_param, U8 UNUSED1, U8 UNUSED2, U8 UNUSED3)
-//{
-//    // this function will set the LED to high or low, depending on remote_param
-//    // the LED to change is dependent on the parameter stored on this module (*((U16*)parameter))
-//    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
-//}
+void change_led_state(U8 sender, void* parameter, U8 remote_param, U8 UNUSED1, U8 UNUSED2, U8 UNUSED3)
+{
+    // this function will set the LED to high or low, depending on remote_param
+    // the LED to change is dependent on the parameter stored on this module (*((U16*)parameter))
+    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);
+}
 
 // TODO: Error state behavior
 // TODO: pitch Error scheme to HOC
-void handle_DAM_error (DAM_ERROR_STATE error_state) {
+void handle_DAM_error (DAM_ERROR_STATE error_state)
+{
     latched_error_state = error_state;
-    switch (error_state) {
+    switch (error_state)
+    {
         // log the error?
         case INITIALIZATION_ERROR:
         {
@@ -96,16 +101,21 @@ void handle_DAM_error (DAM_ERROR_STATE error_state) {
     }
 }
 
-void DAM_init(void) {
-    if (!hasInitialized) {
-        // Run once initialization code
 
-        if (init_can(&GOPHERCAN_HANDLE, THIS_DAM_ID, BXTYPE_MASTER)) {
+// TODO send in all of the correct handles by ref
+void DAM_init(void)
+{
+    if (!hasInitialized)
+    {
+        // Run once initialization code
+        if (init_can(&GOPHERCAN_HANDLE, THIS_DAM_ID, BXTYPE_MASTER))
+        {
             handle_DAM_error(INITIALIZATION_ERROR);
         }
         set_all_params_state(TRUE);
-        init_sensor_hal();
 
+        // CAN commands for the communication with the DLM
+        add_custom_can_func(SET_LED_STATE, &change_led_state, TRUE, NULL);
         add_custom_can_func(SEND_BUCKET_PARAMS, &send_bucket_params, TRUE, NULL);
         add_custom_can_func(BUCKET_OK, &bucket_ok, TRUE, NULL);
         add_custom_can_func(REQUEST_BUCKET, &bucket_requested, TRUE, NULL);
@@ -118,70 +128,96 @@ void DAM_init(void) {
 
     // All code needed for DLM-DAM reset goes here
     stopTimers();
-    // Reset all of the buffers
-    for (U8 i = 0; i < NUM_ADC1_PARAMS; i++) {
+
+    // Reset all of the buffers. Only do the ones that exist
+#if NUM_ADC1_PARAMS > 0
+    for (U8 i = 0; i < NUM_ADC1_PARAMS; i++)
+    {
         reset_buffer(&adc1_sensor_params[i].buffer);
     }
-    for (U8 i = 0; i < NUM_ADC2_PARAMS; i++) {
+#endif // NUM_ADC1_PARAMS > 0
+#if NUM_ADC2_PARAMS > 0
+    for (U8 i = 0; i < NUM_ADC2_PARAMS; i++)
+    {
         reset_buffer(&adc2_sensor_params[i].buffer);
     }
-    for (U8 i = 0; i < NUM_ADC3_PARAMS; i++) {
+#endif // NUM_ADC2_PARAMS > 0
+#if NUM_ADC3_PARAMS > 0
+    for (U8 i = 0; i < NUM_ADC3_PARAMS; i++)
+    {
         reset_buffer(&adc3_sensor_params[i].buffer);
     }
-    for (U8 i = 0; i < NUM_CAN_SENSOR_PARAMS; i++) {
+#endif // NUM_ADC3_PARAMS > 0
+#if NUM_CAN_SENSOR_PARAMS > 0
+    for (U8 i = 0; i < NUM_CAN_SENSOR_PARAMS; i++)
+    {
         reset_buffer(&can_sensor_params[i].buffer);
     }
-
+#endif // NUM_CAN_SENSOR_PARAMS > 0
 
     // enable all bucket params, set status to clean
-    for (U8 i = 0; i < NUM_BUCKETS; i++) {
-        BUCKET* bucket = &buckets[i];
+    // TODO change this to pointer zooming
+    for (U8 i = 0; i < NUM_BUCKETS; i++)
+    {
+        BUCKET* bucket = &bucket_list[i];
         bucket->state = BUCKET_INIT;
 
-
-        for (U16 n = 0; n < bucket->bucket.len; n++) {
-            GENERAL_PARAMETER* param = &bucket->bucket.list[n];
+        // TODO pointer zooming too
+        for (U16 n = 0; n < bucket->param_list.len; n++)
+        {
+            GENERAL_PARAMETER* param = &bucket->param_list.list[n];
             param->status = CLEAN;
-            param->param.float_struct.update_enabled = TRUE;
-            param->param.float_struct.data = INITIAL_DATA; // Set some initial value
-
+            param->can_param->update_enabled = TRUE;
+            param->can_param->data = INITIAL_DATA; // Set some initial value
         }
-        if (!hasInitialized) {
+        if (!hasInitialized)
+        {
 			//create bucket tasks
 			char name_buf[30];
 			sprintf(name_buf, "%s%d", BUCKET_TASK_NAME_BASE, bucket->bucket_id);
 			if (xTaskCreate(send_bucket_task, name_buf, BUCKET_SEND_TASK_STACK_SIZE,
-							(void*) bucket, osPriorityNormal, NULL) != pdPASS) {
+							(void*) bucket, osPriorityNormal, NULL) != pdPASS)
+			{
 				// set error state
 				handle_DAM_error(INITIALIZATION_ERROR);
 			}
 		}
     }
 
-
     hasInitialized = TRUE;
 
 }
 
 
-void complete_DLM_handshake (void) {
-
+// complete_DLM_handshake
+//  This function should get called in its own task and will loop through all of the buckets
+//  attempting to get the correct configuration details until each bucket has been sent and
+//  acked by the DLM
+void complete_DLM_handshake (void)
+{
     boolean all_buckets_ok = FALSE;
-    while (!all_buckets_ok) {
+    while (!all_buckets_ok)
+    {
         boolean check_buckets_ok = TRUE;
 
-        for (U8 i = 0; i < NUM_BUCKETS; i++) {
-            BUCKET* bucket = &buckets[i];
-            if (bucket->state == BUCKET_DLM_OK) {
+        // TODO pointer zooming
+        for (U8 i = 0; i < NUM_BUCKETS; i++)
+        {
+            BUCKET* bucket = &bucket_list[i];
+            if (bucket->state == BUCKET_DLM_OK)
+            {
                 continue; // if bucket ok dont do anything
             }
             check_buckets_ok = FALSE;
-            send_can_command(PRIO_HIGH, DLM_ID, SET_BUCKET_SIZE, bucket->bucket_id, (U8)bucket->bucket.len, 0, 0);
+            send_can_command(PRIO_HIGH, DLM_ID, SET_BUCKET_SIZE, bucket->bucket_id, (U8)bucket->param_list.len, 0, 0);
 
-            for (U16 n = 0; n < bucket->bucket.len; n++) {
-                GENERAL_PARAMETER param = bucket->bucket.list[n];
+            // TODO pointer zooming
+            for (U16 n = 0; n < bucket->param_list.len; n++)
+            {
+            	GENERAL_PARAMETER* param = &bucket->param_list.list[n];
                 send_can_command(PRIO_HIGH, DLM_ID, ADD_PARAM_TO_BUCKET, bucket->bucket_id,
-                                 GET_U16_MSB(param.param.float_struct.param_id), GET_U16_LSB(param.param.float_struct.param_id), 0);
+                                 GET_U16_MSB(param->can_param->param_id),
+								 GET_U16_LSB(param->can_param->param_id), 0);
             }
             osDelay(10); // Delay to avoid flooding the TX_queue
         }
@@ -189,23 +225,32 @@ void complete_DLM_handshake (void) {
     }
 
     // Assign the buckets to the correct frequencies after all buckets OK
-    for (U8 i = 0; i < NUM_BUCKETS; i++) {
-        BUCKET* bucket = &buckets[i];
+    // TODO pointer zooming
+    for (U8 i = 0; i < NUM_BUCKETS; i++)
+    {
+        BUCKET* bucket = &bucket_list[i];
         send_can_command(PRIO_HIGH, DLM_ID, ASSIGN_BUCKET_TO_FRQ,
-                         bucket->bucket_id, GET_U16_MSB(bucket->frequency), GET_U16_LSB(bucket->frequency), 0);
+                         bucket->bucket_id,
+						 GET_U16_MSB(bucket->frequency),
+						 GET_U16_LSB(bucket->frequency), 0);
         bucket->state = BUCKET_GETTING_DATA;
     }
 
-    startTimers(); // Start the data acquisition process
+    // DLM handshake is complete. Start acquiring data
+    startTimers();
     dam_state = NORMAL;
 }
 
 
 
-BUCKET* get_bucket_by_id (U8 bucket_id) {
-    for (U8 i = 0; i < NUM_BUCKETS; i++) {
-        if (buckets[i].bucket_id == bucket_id) {
-            return &buckets[i];
+BUCKET* get_bucket_by_id (U8 bucket_id)
+{
+	// TODO pointer zooming
+    for (U8 i = 0; i < NUM_BUCKETS; i++)
+    {
+        if (bucket_list[i].bucket_id == bucket_id)
+        {
+            return &bucket_list[i];
         }
     }
     return NULL;
@@ -213,155 +258,167 @@ BUCKET* get_bucket_by_id (U8 bucket_id) {
 
 
 
-void ADC_sensor_service (void) {
-    for (U8 i = 0; i < NUM_ADC1_PARAMS; i++) {
+void ADC_sensor_service (void)
+{
+	float data_in;
+	float converted_data;
+	U32 avg;
+
+	// TODO see if we can get fancy and make this one function called 3 times (we def can)
+
+#if NUM_ADC1_PARAMS > 0
+	// TODO pointer zooming
+    for (U8 i = 0; i < NUM_ADC1_PARAMS; i++)
+    {
         ANALOG_SENSOR_PARAM* param = &adc1_sensor_params[i];
-        if (buffer_full(&param->buffer)) {
-            U16 avg;
-            if (average_buffer(&param->buffer, &avg) != BUFFER_SUCCESS) {
+        if (buffer_full(&param->buffer))
+        {
+            if (average_buffer(&param->buffer, &avg) != BUFFER_SUCCESS)
+            {
                 continue;
             }
-            float data_in = avg;
-            float converted;
-            if (apply_analog_sensor_conversion(&param->analog_sensor, data_in, &converted)
-                 != BUFFER_SUCCESS) {
+            data_in = avg;
+
+            if (apply_analog_sensor_conversion(param->analog_sensor, data_in, &converted_data) != BUFFER_SUCCESS)
+            {
                 handle_DAM_error(CONVERSION_ERROR);
             }
             // No data cast as we assume params are set up correctly
-            param->analog_param.param.float_struct.data = converted;
+            param->analog_param.can_param->data = converted_data;
             param->analog_param.status = DIRTY;
-            fill_analog_subparams(param, converted);
+            fill_analog_subparams(param, converted_data);
         }
     }
+#endif // NUM_ADC1_PARAMS > 0
 
-    for (U8 i = 0; i < NUM_ADC2_PARAMS; i++) {
+#if NUM_ADC2_PARAMS > 0
+    // TODO pointer zooming
+    for (U8 i = 0; i < NUM_ADC2_PARAMS; i++)
+    {
         ANALOG_SENSOR_PARAM* param = &adc2_sensor_params[i];
-        if (buffer_full(&param->buffer)) {
-            U16 avg;
-            if (average_buffer(&param->buffer, &avg) != BUFFER_SUCCESS) {
+        if (buffer_full(&param->buffer))
+        {
+            if (average_buffer(&param->buffer, &avg) != BUFFER_SUCCESS)
+            {
                 continue;
             }
-            float data_in = avg;
-            float converted;
-            if (apply_analog_sensor_conversion(&param->analog_sensor, data_in, &converted)
-                 != BUFFER_SUCCESS) {
+            data_in = avg;
+
+            if (apply_analog_sensor_conversion(param->analog_sensor, data_in, &converted_data) != BUFFER_SUCCESS)
+            {
             	 handle_DAM_error(CONVERSION_ERROR);
             }
             // No data cast as we assume params are set up correctly
-            param->analog_param.param.float_struct.data = converted;
+            param->analog_param.can_param->data = converted_data;
             param->analog_param.status = DIRTY;
-            fill_analog_subparams(param, converted);
+            fill_analog_subparams(param, converted_data);
         }
     }
+#endif // NUM_ADC2_PARAMS > 0
 
-    for (U8 i = 0; i < NUM_ADC3_PARAMS; i++) {
+    // TODO pointer zooming
+#if NUM_ADC3_PARAMS > 0
+    for (U8 i = 0; i < NUM_ADC3_PARAMS; i++)
+    {
         ANALOG_SENSOR_PARAM* param = &adc3_sensor_params[i];
-        if (buffer_full(&param->buffer)) {
-            U16 avg;
-            if (average_buffer(&param->buffer, &avg) != BUFFER_SUCCESS) {
+        if (buffer_full(&param->buffer))
+        {
+            if (average_buffer(&param->buffer, &avg) != BUFFER_SUCCESS)
+            {
                 continue;
             }
-            float data_in = avg;
-            float converted;
-            if (apply_analog_sensor_conversion(&param->analog_sensor, data_in, &converted)
-                 != BUFFER_SUCCESS) {
+            data_in = avg;
+
+            if (apply_analog_sensor_conversion(param->analog_sensor, data_in, &converted_data) != BUFFER_SUCCESS)
+            {
             	handle_DAM_error(CONVERSION_ERROR);
             }
             // No data cast as we assume params are set up correctly
-            param->analog_param.param.float_struct.data = converted;
+            param->analog_param.can_param->data = converted_data;
             param->analog_param.status = DIRTY;
-            fill_analog_subparams(param, converted);
+            fill_analog_subparams(param, converted_data);
         }
     }
+#endif // NUM_ADC3_PARAMS > 0
 }
 
 
-void sensorCAN_service (void) {
-    for (U8 i = 0; i < NUM_CAN_SENSOR_PARAMS; i++) {
+void sensorCAN_service (void)
+{
+	U32 avg;
+	float data_in;
+	float converted_data;
+
+	// TODO pointer zooming
+    for (U8 i = 0; i < NUM_CAN_SENSOR_PARAMS; i++)
+    {
         CAN_SENSOR_PARAM* param = &can_sensor_params[i];
-        if (buffer_full(&param->buffer)) {
-            U16 avg;
-            if (average_buffer(&param->buffer, &avg) != BUFFER_SUCCESS) {
+        if (buffer_full(&param->buffer))
+        {
+            if (average_buffer(&param->buffer, &avg) != BUFFER_SUCCESS)
+            {
                 continue;
             }
-            float data_in = avg;
-            float converted;
-            if (apply_can_sensor_conversion(&param->can_sensor, param->message_idx, data_in, &converted)
-                 != BUFFER_SUCCESS) {
+            data_in = avg;
+
+            if (apply_can_sensor_conversion(param->can_sensor, param->message_idx, data_in, &converted_data) != BUFFER_SUCCESS)
+            {
             	handle_DAM_error(CONVERSION_ERROR);
             }
             // No data cast as we assume params are set up correctly
-            param->can_param.param.float_struct.data = converted; // fill the data
+            param->can_param.can_param->data = converted_data; // fill the data
             param->can_param.status = DIRTY;
-            fill_can_subparams(param, converted);
+            fill_can_subparams(param, converted_data);
         }
     }
 }
 
-// THis has to do with filtering, so do this whomever implements that
-void fill_can_subparams (CAN_SENSOR_PARAM* param, float newdata) {
-    for (U8 i = 0; i < param->num_filtered_params; i++) {
-//        U16_BUFFER temp = param->buffer;
-//        apply_filter(&temp, &param->filtered_subparams[i]);
-//        U16 avg;
-//        if (average_buffer(&param->buffer, &avg) != BUFFER_SUCCESS) {
-//            continue;
-//        }
-//        float data_in = avg;
-//        float converted;
-//        if (apply_can_sensor_conversion(&param->can_sensor, param->message_idx, data_in, &converted)
-//             != BUFFER_SUCCESS) {
-//            converted = DATA_CONV_FAILURE_REPLACEMENT;
-//        }
-        // No data cast as we assume params are set up correctly
-        param->filtered_subparams[i].filtered_param.param.float_struct.data = newdata; //fill the data
-        param->filtered_subparams[i].filtered_param.status = DIRTY;
+// This has to do with filtering, so do this whomever implements that
+void fill_can_subparams (CAN_SENSOR_PARAM* param, float newdata)
+{
+	// TODO pointer zooming
+    for (U8 i = 0; i < param->num_filtered_subparams; i++)
+    {
+    	// TODO implement can subparams?
     }
 }
 
-
-// THis has to do with filtering, so do this whomever implements that
-void fill_analog_subparams (ANALOG_SENSOR_PARAM* param, float newdata) {
-    for (U8 i = 0; i < param->num_filtered_subparams; i++) {
-//            U16_BUFFER temp = param->buffer;
-//            apply_filter(&temp, &param->filtered_subparams[i]);
-//            U16 avg;
-//            if (average_buffer(&param->buffer, &avg) != BUFFER_SUCCESS) {
-//                continue;
-//            }
-//            float data_in = avg;
-//            float converted;
-//            if (apply_analog_sensor_conversion(&param->analog_sensor, data_in, &converted) != BUFFER_SUCCESS) {
-//                converted = DATA_CONV_FAILURE_REPLACEMENT;
-//            }
-            // No data cast as we assume params are set up correctly
-            param->filtered_subparams[i].filtered_param.param.float_struct.data = newdata; //fill the data
-            param->filtered_subparams[i].filtered_param.status = DIRTY;
+// This has to do with filtering, so do this whomever implements that
+void fill_analog_subparams (ANALOG_SENSOR_PARAM* param, float newdata)
+{
+	// TODO pointer zooming
+    for (U8 i = 0; i < param->num_filtered_subparams; i++)
+    {
+    	// TODO implement can subparams?
     }
 }
 
 
 
-/* send_bucket_task
- * Task created when BucketRequest gopherCAN command is recieved
- * sends all parameters in the provided bucket, deletes upon completion
- */
-void send_bucket_task (void* pvParameters) {
+// send_bucket_task
+//  one task for each bucket. This will loop through and send each bucket parameter when the bucket is
+//  requested and bucket->state is changed
+void send_bucket_task (void* pvParameters)
+{
     BUCKET* bucket = (BUCKET*) pvParameters;
 
-    while(1){
-    	while (bucket->state != BUCKET_REQUESTED){
-    		taskYIELD();
-    	}
+    while(1)
+    {
+    	while (bucket->state != BUCKET_REQUESTED) taskYIELD();
 
 		// send the bucket parameters
-		for (U8 i = 0; i < bucket->bucket.len; i++) {
-			GENERAL_PARAMETER* param = &bucket->bucket.list[i];
-			if (param->status < DIRTY) {
+    	// TODO pointer zooming
+		for (U8 i = 0; i < bucket->param_list.len; i++)
+		{
+			GENERAL_PARAMETER* param = &bucket->param_list.list[i];
+			if (param->status < DIRTY)
+			{
 				U16 err_count = 0;
-				while (send_parameter(PRIO_HIGH, DLM_ID, param->param.float_struct.param_id) != CAN_SUCCESS) {
-					if (++err_count > BUCKET_SEND_MAX_ATTEMPTS) {
-						//Todo set error state behavior
+				while (send_parameter(PRIO_HIGH, DLM_ID, param->can_param->param_id) != CAN_SUCCESS)
+				{
+					if (++err_count > BUCKET_SEND_MAX_ATTEMPTS)
+					{
+						//TODO set error state behavior
 						handle_DAM_error(TBD_ERROR);
 						break;
 					}
@@ -374,6 +431,8 @@ void send_bucket_task (void* pvParameters) {
 
 		bucket->state = BUCKET_GETTING_DATA;
     }
+
+    // this should never be reached
     vTaskDelete(NULL);
 }
 
@@ -438,7 +497,7 @@ void bucket_ok(MODULE_ID sender, void* parameter,
         bucket->state = BUCKET_DLM_OK;
     }
     else {
-        // todo set error states
+        // TODO set error states
         handle_DAM_error(TBD_ERROR);
     }
 }
