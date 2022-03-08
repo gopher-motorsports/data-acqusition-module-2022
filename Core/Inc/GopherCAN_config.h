@@ -16,8 +16,6 @@
 #define F7XX 7
 
 // Begin Configuration defines. These are to be modified by the module specific developer
-#define AUTOGEN_EXTERNS
-
 #define TARGET F7XX
 //#define TARGET F7XX
 

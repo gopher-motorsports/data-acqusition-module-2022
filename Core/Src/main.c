@@ -147,17 +147,9 @@ int main(void)
   MX_TIM11_Init();
   MX_TIM14_Init();
   /* USER CODE BEGIN 2 */
-//  HAL_CAN_Start(&hcan1);
-//  int i;
-//  while(1) {
-//	  if (HAL_CAN_GetRxFifoFillLevel(&hcan1, 0) > 0) {
-//		i++;
-//	  }
-//	  if (HAL_CAN_GetRxFifoFillLevel(&hcan1, 1) > 0) {
-//		  i++;
-//	  }
-//  }
-  DAM_init();
+
+  DAM_init(&hcan1, DAM_FR_ID, &hcan2, &hadc1, &hadc2, &hadc3,
+		   &htim10, &htim11, &htim14);
   /* USER CODE END 2 */
 
   /* Init scheduler */
