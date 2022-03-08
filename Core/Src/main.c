@@ -148,7 +148,8 @@ int main(void)
   MX_TIM14_Init();
   /* USER CODE BEGIN 2 */
 
-  DAM_init();
+  DAM_init(&hcan1, DAM_FR_ID, &hcan2, &hadc1, &hadc2, &hadc3,
+		   &htim10, &htim11, &htim14);
   /* USER CODE END 2 */
 
   /* Init scheduler */

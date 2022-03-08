@@ -6,7 +6,6 @@
 
 #include "sensor_hal.h"
 
-
 #define NUM_ADC1_PARAMS 1
 #define NUM_ADC2_PARAMS 1
 #define NUM_ADC3_PARAMS 0
