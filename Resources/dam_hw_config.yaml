@@ -79,6 +79,7 @@ buckets:
         parameters:
             - float_tester
             - float_tester_2
+            - u16_tester
 
     bucket_2:
         id: 2

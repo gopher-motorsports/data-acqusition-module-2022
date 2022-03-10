@@ -149,7 +149,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   DAM_init(&hcan1, DAM_FR_ID, &hcan2, &hadc1, &hadc2, &hadc3,
-		   &htim10, &htim11, &htim14);
+		   &htim10, &htim11, &htim14, GPIOB, GPIO_PIN_0);
   /* USER CODE END 2 */
 
   /* Init scheduler */
