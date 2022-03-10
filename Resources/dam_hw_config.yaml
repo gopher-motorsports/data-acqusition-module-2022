@@ -6,11 +6,15 @@ gophercan_module_id: 2
 data_input_methods:
     adc_channels:
         ADC1_IN5:
-            sensor: "test_analog_sensor"
+            sensor: "test_voltage_sensor"
             min_frequency: 100
 
         ADC2_IN6:
             sensor: "test_resistive_sensor"
+            min_frequency: 100
+            
+        ADC3_IN7:
+            sensor: "test_current_sensor"
             min_frequency: 100
             
     can_sensors:
@@ -27,33 +31,40 @@ parameters_produced:
 
     float_tester_2:
         produced_by: ADC2_IN6
-        sensor_output: current
+        sensor_output: resistance
         filter_subparams:
         buffering:
             num_samples_buffered: 100
             
     float_tester_3:
+        produced_by: ADC3_IN7
+        sensor_output: current
+        filter_subparams:
+        buffering:
+            num_samples_buffered: 100
+            
+    float_tester_4:
         produced_by: can_sensor_1
         sensor_output: d16_fixed
         filter_subparams:
         buffering:
             num_samples_buffered: 1
             
-    float_tester_4:
+    float_tester_5:
         produced_by: can_sensor_1
         sensor_output: u16_raw
         filter_subparams:
         buffering:
             num_samples_buffered: 1
             
-    float_tester_5:
+    float_tester_6:
         produced_by: can_sensor_1
         sensor_output: float_1_raw
         filter_subparams:
         buffering:
             num_samples_buffered: 1
             
-    float_tester_6:
+    float_tester_7:
         produced_by: can_sensor_1
         sensor_output: float_2_scaled
         filter_subparams:
@@ -82,4 +93,5 @@ buckets:
         parameters:
             - float_tester_5
             - float_tester_6
+            - float_tester_7
 

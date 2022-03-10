@@ -91,7 +91,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Gopher_Sense/Build/dam_hw_config.c|Gopher_Sense/Templates|gophercan-lib/other_files|gophercan-lib/gophercannon|gophercan-lib/example_files|gophercan-lib/config_outdated" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
+						<entry excluding="Gopher_Sense/Templates|gophercan-lib/other_files|gophercan-lib/gophercannon|gophercan-lib/example_files|gophercan-lib/config_outdated" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
 					</sourceEntries>
@@ -182,7 +182,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Gopher_Sense/Build/dam_hw_config.c|Gopher_Sense/Templates|gophercan-lib/other_files|gophercan-lib/gophercannon|gophercan-lib/example_files|gophercan-lib/config_outdated" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
+						<entry excluding="Gopher_Sense/Templates|gophercan-lib/other_files|gophercan-lib/gophercannon|gophercan-lib/example_files|gophercan-lib/config_outdated" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Middlewares"/>
 					</sourceEntries>
