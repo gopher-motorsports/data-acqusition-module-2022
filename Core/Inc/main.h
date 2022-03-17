@@ -62,6 +62,10 @@ void Error_Handler(void);
 #define BUTTON_GPIO_Port GPIOC
 #define GRN_LED_Pin GPIO_PIN_0
 #define GRN_LED_GPIO_Port GPIOB
+#define RED_LED_Pin GPIO_PIN_14
+#define RED_LED_GPIO_Port GPIOB
+#define BLU_LED_Pin GPIO_PIN_7
+#define BLU_LED_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

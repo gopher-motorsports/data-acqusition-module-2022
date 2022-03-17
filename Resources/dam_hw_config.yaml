@@ -83,14 +83,14 @@ buckets:
 
     bucket_2:
         id: 2
-        frequency: 50
+        frequency: 100
         parameters:
             - float_tester_3
             - float_tester_4
 
     bucket_3:
         id: 3
-        frequency: 1
+        frequency: 100
         parameters:
             - float_tester_5
             - float_tester_6
