@@ -58,14 +58,8 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define BUTTON_Pin GPIO_PIN_13
-#define BUTTON_GPIO_Port GPIOC
-#define GRN_LED_Pin GPIO_PIN_0
-#define GRN_LED_GPIO_Port GPIOB
-#define RED_LED_Pin GPIO_PIN_14
-#define RED_LED_GPIO_Port GPIOB
-#define BLU_LED_Pin GPIO_PIN_7
-#define BLU_LED_GPIO_Port GPIOB
+#define GRN_LED_Pin GPIO_PIN_2
+#define GRN_LED_GPIO_Port GPIOE
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
