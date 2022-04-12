@@ -129,8 +129,13 @@ int main(void)
   // DEBUG
   HAL_GPIO_WritePin(GRN_LED_GPIO_Port, GRN_LED_Pin, GPIO_PIN_SET);
 
-  DAM_init(&hcan1, DAM_FR_ID, &hcan2, &hadc1, &hadc2, &hadc3,
-		   &htim10, GRN_LED_GPIO_Port, GRN_LED_Pin);
+  if (init_can(&hcan1, DAM_FR_ID, BXTYPE_MASTER))
+    {
+        // an error starting CAN has occurred. blink code 1
+  	  handle_DAM_error(INITIALIZATION_ERROR);
+    }
+    DAM_init(&hcan1, &hcan2, &hadc1, &hadc2, &hadc3,
+  		   &htim10, DAM_LED_GPIO_Port, DAM_LED_Pin);
 
   /* USER CODE END 2 */
 
