@@ -57,7 +57,6 @@ CAN_HandleTypeDef hcan2;
 
 TIM_HandleTypeDef htim10;
 
-osThreadId dam_main_taskHandle;
 osThreadId gcan_rx_taskHandle;
 osThreadId gcan_tx_taskHandle;
 /* USER CODE BEGIN PV */
@@ -74,8 +73,7 @@ static void MX_ADC3_Init(void);
 static void MX_CAN2_Init(void);
 static void MX_TIM10_Init(void);
 static void MX_DMA_Init(void);
-void DAM_main_task_ent(void const * argument);
-void gopherCAN_rx_buffer_service_task_ent(void const * argument);
+void gopherCAN_rx_buffer_service_task_entry(void const * argument);
 void gopherCAN_tx_service_task_ent(void const * argument);
 
 /* USER CODE BEGIN PFP */
@@ -135,7 +133,7 @@ int main(void)
   	  handle_DAM_error(INITIALIZATION_ERROR);
     }
     DAM_init(&hcan1, &hcan2, &hadc1, &hadc2, &hadc3,
-  		   &htim10, DAM_LED_GPIO_Port, DAM_LED_Pin);
+  		   &htim10, GRN_LED_GPIO_Port, GRN_LED_Pin);
 
   /* USER CODE END 2 */
 
@@ -156,12 +154,8 @@ int main(void)
   /* USER CODE END RTOS_QUEUES */
 
   /* Create the thread(s) */
-  /* definition and creation of dam_main_task */
-  osThreadDef(dam_main_task, DAM_main_task_ent, osPriorityIdle, 0, 512);
-  dam_main_taskHandle = osThreadCreate(osThread(dam_main_task), NULL);
-
   /* definition and creation of gcan_rx_task */
-  osThreadDef(gcan_rx_task, gopherCAN_rx_buffer_service_task_ent, osPriorityLow, 0, 512);
+  osThreadDef(gcan_rx_task, gopherCAN_rx_buffer_service_task_entry, osPriorityLow, 0, 512);
   gcan_rx_taskHandle = osThreadCreate(osThread(gcan_rx_task), NULL);
 
   /* definition and creation of gcan_tx_task */
@@ -714,43 +708,23 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE END 4 */
 
-/* USER CODE BEGIN Header_DAM_main_task_ent */
+/* USER CODE BEGIN Header_gopherCAN_rx_buffer_service_task_entry */
 /**
-  * @brief  Function implementing the dam_main_task thread.
+  * @brief  Function implementing the gcan_rx_task thread.
   * @param  argument: Not used
   * @retval None
   */
-/* USER CODE END Header_DAM_main_task_ent */
-void DAM_main_task_ent(void const * argument)
+/* USER CODE END Header_gopherCAN_rx_buffer_service_task_entry */
+void gopherCAN_rx_buffer_service_task_entry(void const * argument)
 {
   /* USER CODE BEGIN 5 */
   /* Infinite loop */
   for(;;)
   {
-		DAM_main_task();
-		// Should never get here
-		Error_Handler();
+	  gopherCAN_rx_buffer_service_task();
+	  osDelay(1);
   }
   /* USER CODE END 5 */
-}
-
-/* USER CODE BEGIN Header_gopherCAN_rx_buffer_service_task_ent */
-/**
-* @brief Function implementing the gcan_rx_task thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_gopherCAN_rx_buffer_service_task_ent */
-void gopherCAN_rx_buffer_service_task_ent(void const * argument)
-{
-  /* USER CODE BEGIN gopherCAN_rx_buffer_service_task_ent */
-  /* Infinite loop */
-  for(;;)
-  {
-	  gopherCAN_rx_buffer_service_task();
-    osDelay(1);
-  }
-  /* USER CODE END gopherCAN_rx_buffer_service_task_ent */
 }
 
 /* USER CODE BEGIN Header_gopherCAN_tx_service_task_ent */
